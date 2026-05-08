@@ -73,14 +73,15 @@ public class MovieRentalManagement {
 
 
     // Customer management submenu
-    private static void customerMenu(Scanner scanner, Connection connection) {
+   private static void customerMenu(Scanner scanner, Connection connection) {
         boolean running = true;
         while (running) {
             System.out.println("\n-- Customer Management --");
-            System.out.println("1. Add Customer");
-            System.out.println("2. Update Customer Email");
-            System.out.println("3. Delete Customer");
-            System.out.println("4. Back");
+            System.out.println("1. List All Customers");
+            System.out.println("2. Add Customer");
+            System.out.println("3. Update Customer Email");
+            System.out.println("4. Delete Customer");
+            System.out.println("5. Back");
             System.out.print("Enter choice: ");
 
             int choice = 0;
@@ -94,14 +95,15 @@ public class MovieRentalManagement {
             }
 
             switch (choice) {
-                case 1 -> addCustomer(scanner, connection);
-                case 2 -> updateCustomerEmail(scanner, connection);
-                case 3 -> deleteCustomer(scanner, connection);
-                case 4 -> running = false; // back to main menu
+                case 1 -> new CustomerManager().displayAllCustomers();
+                case 2 -> addCustomer(scanner, connection);
+                case 3 -> updateCustomerEmail(scanner, connection);
+                case 4 -> deleteCustomer(scanner, connection);
+                case 5 -> running = false;
                 default -> System.out.println("Invalid choice. Try again.");
             }
         }
-    } 
+    }
 
 
     // Movie inventory submenu
@@ -223,7 +225,7 @@ public class MovieRentalManagement {
 
 
     // Customer actions
-    private static void addCustomer(Scanner scanner, Connection connection) {
+private static void addCustomer(Scanner scanner, Connection connection) {
         CustomerManager customerManager = new CustomerManager();
         System.out.print("First name: ");
         String fname = scanner.nextLine();
@@ -236,20 +238,20 @@ public class MovieRentalManagement {
 
     private static void updateCustomerEmail(Scanner scanner, Connection connection) {
         CustomerManager customerManager = new CustomerManager();
-        System.out.print("Customer ID: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("New email: ");
-        String email = scanner.nextLine();
-        customerManager.updateCustomerEmail(id, email);
+        customerManager.displayAllCustomers(); // show table first
+        System.out.print("Enter current email to update: ");
+        String currentEmail = scanner.nextLine();
+        System.out.print("Enter new email: ");
+        String newEmail = scanner.nextLine();
+        customerManager.updateCustomerEmail(currentEmail, newEmail);
     }
 
     private static void deleteCustomer(Scanner scanner, Connection connection) {
         CustomerManager customerManager = new CustomerManager();
-        System.out.print("Customer ID: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-        customerManager.deleteCustomer(id);
+        customerManager.displayAllCustomers(); // show table first
+        System.out.print("Enter customer email to delete: ");
+        String email = scanner.nextLine();
+        customerManager.deleteCustomer(email);
     }
 
 

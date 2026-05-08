@@ -16,11 +16,15 @@ public class DBManager {
     }
 
     public static Connection getConnection() {
-        if (connection == null) {
-            setConnection();
+    try {
+        if (connection == null || connection.isClosed()) {
+            setConnection(); // reconnect if closed
         }
-        return connection;
+    } catch (SQLException e) {
+        System.out.println("Error checking connection: " + e.getMessage());
     }
+    return connection;
+}
 
     private static void setConnection() {
         try {
