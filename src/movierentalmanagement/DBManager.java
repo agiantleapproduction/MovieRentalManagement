@@ -16,17 +16,20 @@ public class DBManager {
     }
 
     public static Connection getConnection() {
-        if (connection == null) {
-            setConnection();
+    try {
+        if (connection == null || connection.isClosed()) {
+            setConnection(); // reconnect if closed
         }
-        return connection;
+    } catch (SQLException e) {
+        System.out.println("Error checking connection: " + e.getMessage());
     }
+    return connection;
+}
 
     private static void setConnection() {
         try {
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection(jdbcURL, username, password);
-            System.out.println("Database connection established successfully!");
         } catch (ClassNotFoundException e) {
             System.out.println("Cannot load the PostgreSQL driver.");
         } catch (SQLException e) {
