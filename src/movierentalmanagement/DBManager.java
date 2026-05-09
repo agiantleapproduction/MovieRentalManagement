@@ -30,7 +30,6 @@ public class DBManager {
         try {
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection(jdbcURL, username, password);
-            System.out.println("Database connection established successfully!");
         } catch (ClassNotFoundException e) {
             System.out.println("Cannot load the PostgreSQL driver.");
         } catch (SQLException e) {

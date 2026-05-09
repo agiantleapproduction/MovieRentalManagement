@@ -44,7 +44,8 @@ public class MovieManager {
 
     // Display all movies in table format
     public void displayAllMovies() {
-        String sql = "SELECT movie_id, title, release_year, rental_rate FROM movie ORDER BY title ASC";
+        // Changed ORDER BY title ASC to ORDER BY movie_id ASC
+        String sql = "SELECT movie_id, title, release_year, rental_rate FROM movie ORDER BY movie_id ASC";
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {

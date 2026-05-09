@@ -26,7 +26,8 @@ public class EmployeeManager {
 
     // Display all employees in table format
     public void displayAllEmployees() {
-        String sql = "SELECT employee_id, first_name, last_name, role FROM employee ORDER BY last_name ASC";
+        // Changed ORDER BY last_name ASC to ORDER BY employee_id ASC
+        String sql = "SELECT employee_id, first_name, last_name, role FROM employee ORDER BY employee_id ASC";
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {

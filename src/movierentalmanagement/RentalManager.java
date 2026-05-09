@@ -91,7 +91,8 @@ public class RentalManager {
 
     // Display all active rentals from view
     public void displayActiveRentals() {
-        String sql = "SELECT * FROM vw_active_rentals";
+        // Sorts by rent_date ASC to show oldest rentals first
+        String sql = "SELECT * FROM vw_active_rentals ORDER BY rent_date ASC";
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
@@ -110,5 +111,44 @@ public class RentalManager {
             System.out.println("Error fetching active rentals: " + e.getMessage());
         }
     }
-
-} 
+    
+    // Display unreturned movies for a specific customer
+    public boolean displayCustomerActiveRentals(String customerEmail) {
+        String sql = "SELECT m.movie_id, m.title, r.rent_date " +
+                     "FROM rental r " +
+                     "JOIN movie m ON r.movie_id = m.movie_id " +
+                     "JOIN customer c ON r.customer_id = c.customer_id " +
+                     "WHERE c.email = ? AND r.return_date IS NULL " +
+                     "ORDER BY r.rent_date ASC";
+        
+        boolean hasRentals = false;
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, customerEmail);
+            ResultSet rs = pstmt.executeQuery();
+            
+            System.out.println("\n--- Customer's Active Rentals ---");
+            while (rs.next()) {
+                if (!hasRentals) {
+                    System.out.printf("%-10s %-30s %-15s\n", "Movie ID", "Title", "Rent Date");
+                    System.out.println("-------------------------------------------------------");
+                    hasRentals = true;
+                }
+                System.out.printf("%-10d %-30s %-15s\n", 
+                    rs.getInt("movie_id"), 
+                    rs.getString("title"), 
+                    rs.getDate("rent_date"));
+            }
+            
+            if (!hasRentals) {
+                System.out.println("No active rentals found for this email.");
+            } else {
+                System.out.println("-------------------------------------------------------");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching customer rentals: " + e.getMessage());
+        }
+        return hasRentals;
+    }
+}
