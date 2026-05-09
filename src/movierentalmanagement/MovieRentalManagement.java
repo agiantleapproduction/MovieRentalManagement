@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package movierentalmanagement;
 import java.util.Scanner;
 import java.sql.Connection;
@@ -33,7 +29,6 @@ public class MovieRentalManagement {
         // Keep showing the main menu until user exits
         while (running) {
 
-            // Print main menu options
             System.out.println("\n== Movie Rental System ===");
             System.out.println("1. Customer Management");
             System.out.println("2. Movie Inventory");
@@ -42,7 +37,6 @@ public class MovieRentalManagement {
             System.out.println("5. Exit");
             System.out.print("Enter choice: ");
 
-            // Read user input, catch non-number input
             int choice = 0;
             try {
                 choice = scanner.nextInt();
@@ -53,7 +47,6 @@ public class MovieRentalManagement {
                 continue;
             }
 
-            // Route to the correct sub-menu based on user choice
             switch (choice) {
                 case 1 -> customerMenu(scanner, connection);
                 case 2 -> movieMenu(scanner, connection);
@@ -70,6 +63,7 @@ public class MovieRentalManagement {
         scanner.close();
 
     } 
+
 
     // Customer management sub-menu
     private static void customerMenu(Scanner scanner, Connection connection) {
@@ -136,12 +130,9 @@ public class MovieRentalManagement {
         }
     } 
 
-
     // Rental & Return sub-menu
     private static void rentalMenu(Scanner scanner, Connection connection) {
         RentalManager rentalManager = new RentalManager();
-        EmployeeManager employeeManager = new EmployeeManager();
-        MovieManager movieManager = new MovieManager();
         boolean running = true;
         while (running) {
             System.out.println("\n-- Rental & Return --");
@@ -162,36 +153,54 @@ public class MovieRentalManagement {
             }
 
             switch (choice) {
-                case 1 -> {
-                    employeeManager.displayAllEmployees();
-                    System.out.print("Employee ID: ");
-                    int employeeId = scanner.nextInt();
-                    scanner.nextLine();
-                    new CustomerManager().displayAllCustomers();
-                    System.out.print("Customer email: ");
-                    String customerEmail = scanner.nextLine();
-                    movieManager.displayAllMovies();
-                    System.out.print("Movie ID: ");
-                    int movieId = scanner.nextInt();
-                    scanner.nextLine();
-                    rentalManager.processRental(customerEmail, movieId, employeeId);
-                }
-                case 2 -> {
-                    new CustomerManager().displayAllCustomers();
-                    System.out.print("Customer email: ");
-                    String customerEmail = scanner.nextLine();
-                    movieManager.displayAllMovies();
-                    System.out.print("Movie ID: ");
-                    int movieId = scanner.nextInt();
-                    scanner.nextLine();
-                    rentalManager.processReturn(customerEmail, movieId);
-                }
+                case 1 -> processRental(scanner, rentalManager);
+                case 2 -> processReturn(scanner, rentalManager);
                 case 3 -> rentalManager.displayActiveRentals();
                 case 4 -> running = false;
                 default -> System.out.println("Invalid choice. Try again.");
             }
         }
     } 
+
+
+    // Handles collecting input and calling RentalManager.processRental
+    private static void processRental(Scanner scanner, RentalManager rentalManager) {
+        EmployeeManager employeeManager = new EmployeeManager();
+        MovieManager movieManager = new MovieManager();
+
+        employeeManager.displayAllEmployees();
+        System.out.print("Employee ID: ");
+        int employeeId = scanner.nextInt();
+        scanner.nextLine();
+
+        new CustomerManager().displayAllCustomers();
+        System.out.print("Customer email: ");
+        String customerEmail = scanner.nextLine();
+
+        movieManager.displayAllMovies();
+        System.out.print("Movie ID: ");
+        int movieId = scanner.nextInt();
+        scanner.nextLine();
+
+        rentalManager.processRental(customerEmail, movieId, employeeId);
+    }
+
+
+    // Handles collecting input and calling RentalManager.processReturn
+    private static void processReturn(Scanner scanner, RentalManager rentalManager) {
+        MovieManager movieManager = new MovieManager();
+
+        new CustomerManager().displayAllCustomers();
+        System.out.print("Customer email: ");
+        String customerEmail = scanner.nextLine();
+
+        movieManager.displayAllMovies();
+        System.out.print("Movie ID: ");
+        int movieId = scanner.nextInt();
+        scanner.nextLine();
+
+        rentalManager.processReturn(customerEmail, movieId);
+    }
 
 
     // Reports sub-menu
