@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public class CustomerManager {
 
-    // Add a new customer 
+    // Add a new customer (Insert)
     public void addCustomer(String firstName, String lastName, String email) {
         String sql = "INSERT INTO customer (first_name, last_name, email) VALUES (?, ?, ?)";
         try (Connection conn = DBManager.getConnection();
@@ -24,7 +24,7 @@ public class CustomerManager {
         }
     }
 
-    // List all customers in a table format
+    // List all customers in table format
     public void displayAllCustomers() {
         String sql = "SELECT first_name, last_name, email FROM customer ORDER BY last_name ASC";
         try (Connection conn = DBManager.getConnection();
@@ -44,7 +44,7 @@ public class CustomerManager {
         }
     }
 
-    // 3. Update customer email by matching current email
+    // Update customer email by matching current email
     public void updateCustomerEmail(String currentEmail, String newEmail) {
         String sql = "UPDATE customer SET email = ? WHERE email = ?";
         try (Connection conn = DBManager.getConnection();

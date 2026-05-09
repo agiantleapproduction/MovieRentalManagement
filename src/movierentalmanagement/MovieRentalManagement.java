@@ -45,35 +45,34 @@ public class MovieRentalManagement {
             // Read user input, catch non-number input
             int choice = 0;
             try {
-                choice = scanner.nextInt(); // reads the number the user typed
-                scanner.nextLine(); // clears the leftover newline from the buffer
+                choice = scanner.nextInt();
+                scanner.nextLine();
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a number."); // If user types word
-                scanner.nextLine(); // clears the bad input so the loop doesn't freeze
-                continue; // jump back to top of while loop
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
+                continue;
             }
 
             // Route to the correct sub-menu based on user choice
             switch (choice) {
-                case 1 -> customerMenu(scanner, connection); // customer sub-menu
-                case 2 -> movieMenu(scanner, connection);    // movie sub-menu
-                case 3 -> rentalMenu(scanner, connection);   // rental sub-menu
-                case 4 -> reportsMenu(scanner, connection);  // reports sub-menu
+                case 1 -> customerMenu(scanner, connection);
+                case 2 -> movieMenu(scanner, connection);
+                case 3 -> rentalMenu(scanner, connection);
+                case 4 -> reportsMenu(scanner, connection);
                 case 5 -> {
-                    System.out.println("Goodbye!"); // exit message
-                    running = false; // stops while loop
+                    System.out.println("Goodbye!");
+                    running = false;
                 }
-                default -> System.out.println("Invalid choice. Try again."); // any choice outside 1-5
+                default -> System.out.println("Invalid choice. Try again.");
             }
         }
 
-        scanner.close(); 
+        scanner.close();
 
     } 
 
-
-    // Customer management submenu
-   private static void customerMenu(Scanner scanner, Connection connection) {
+    // Customer management sub-menu
+    private static void customerMenu(Scanner scanner, Connection connection) {
         boolean running = true;
         while (running) {
             System.out.println("\n-- Customer Management --");
@@ -103,17 +102,18 @@ public class MovieRentalManagement {
                 default -> System.out.println("Invalid choice. Try again.");
             }
         }
-    }
+    } 
 
 
-    // Movie inventory submenu
+    // Movie inventory sub-menu
     private static void movieMenu(Scanner scanner, Connection connection) {
         boolean running = true;
         while (running) {
             System.out.println("\n-- Movie Inventory --");
-            System.out.println("1. Add Movie");
-            System.out.println("2. Remove Movie");
-            System.out.println("3. Back");
+            System.out.println("1. List All Movies");
+            System.out.println("2. Add Movie");
+            System.out.println("3. Remove Movie");
+            System.out.println("4. Back");
             System.out.print("Enter choice: ");
 
             int choice = 0;
@@ -127,18 +127,21 @@ public class MovieRentalManagement {
             }
 
             switch (choice) {
-                case 1 -> addMovie(scanner, connection);
-                case 2 -> removeMovie(scanner, connection);
-                case 3 -> running = false; // back to main menu
+                case 1 -> new MovieManager().displayAllMovies();
+                case 2 -> addMovie(scanner, connection);
+                case 3 -> removeMovie(scanner, connection);
+                case 4 -> running = false;
                 default -> System.out.println("Invalid choice. Try again.");
             }
         }
     } 
 
 
-    // Rental & Return submenu
+    // Rental & Return sub-menu
     private static void rentalMenu(Scanner scanner, Connection connection) {
         RentalManager rentalManager = new RentalManager();
+        EmployeeManager employeeManager = new EmployeeManager();
+        MovieManager movieManager = new MovieManager();
         boolean running = true;
         while (running) {
             System.out.println("\n-- Rental & Return --");
@@ -160,22 +163,28 @@ public class MovieRentalManagement {
 
             switch (choice) {
                 case 1 -> {
-                    System.out.print("Customer ID: ");
-                    int customerId = scanner.nextInt();
-                    System.out.print("Movie ID: ");
-                    int movieId = scanner.nextInt();
+                    employeeManager.displayAllEmployees();
                     System.out.print("Employee ID: ");
                     int employeeId = scanner.nextInt();
                     scanner.nextLine();
-                    rentalManager.processRental(customerId, movieId, employeeId);
-                }
-                case 2 -> {
-                    System.out.print("Customer ID: ");
-                    int customerId = scanner.nextInt();
+                    new CustomerManager().displayAllCustomers();
+                    System.out.print("Customer email: ");
+                    String customerEmail = scanner.nextLine();
+                    movieManager.displayAllMovies();
                     System.out.print("Movie ID: ");
                     int movieId = scanner.nextInt();
                     scanner.nextLine();
-                    rentalManager.processReturn(customerId, movieId);
+                    rentalManager.processRental(customerEmail, movieId, employeeId);
+                }
+                case 2 -> {
+                    new CustomerManager().displayAllCustomers();
+                    System.out.print("Customer email: ");
+                    String customerEmail = scanner.nextLine();
+                    movieManager.displayAllMovies();
+                    System.out.print("Movie ID: ");
+                    int movieId = scanner.nextInt();
+                    scanner.nextLine();
+                    rentalManager.processReturn(customerEmail, movieId);
                 }
                 case 3 -> rentalManager.displayActiveRentals();
                 case 4 -> running = false;
@@ -185,7 +194,7 @@ public class MovieRentalManagement {
     } 
 
 
-    // Reports submenu
+    // Reports sub-menu
     private static void reportsMenu(Scanner scanner, Connection connection) {
         EmployeeManager employeeManager = new EmployeeManager();
         boolean running = true;
@@ -225,7 +234,7 @@ public class MovieRentalManagement {
 
 
     // Customer actions
-private static void addCustomer(Scanner scanner, Connection connection) {
+    private static void addCustomer(Scanner scanner, Connection connection) {
         CustomerManager customerManager = new CustomerManager();
         System.out.print("First name: ");
         String fname = scanner.nextLine();
@@ -238,7 +247,7 @@ private static void addCustomer(Scanner scanner, Connection connection) {
 
     private static void updateCustomerEmail(Scanner scanner, Connection connection) {
         CustomerManager customerManager = new CustomerManager();
-        customerManager.displayAllCustomers(); // show table first
+        customerManager.displayAllCustomers();
         System.out.print("Enter current email to update: ");
         String currentEmail = scanner.nextLine();
         System.out.print("Enter new email: ");
@@ -248,7 +257,7 @@ private static void addCustomer(Scanner scanner, Connection connection) {
 
     private static void deleteCustomer(Scanner scanner, Connection connection) {
         CustomerManager customerManager = new CustomerManager();
-        customerManager.displayAllCustomers(); // show table first
+        customerManager.displayAllCustomers();
         System.out.print("Enter customer email to delete: ");
         String email = scanner.nextLine();
         customerManager.deleteCustomer(email);
@@ -272,7 +281,8 @@ private static void addCustomer(Scanner scanner, Connection connection) {
 
     private static void removeMovie(Scanner scanner, Connection connection) {
         MovieManager movieManager = new MovieManager();
-        System.out.print("Movie ID: ");
+        movieManager.displayAllMovies();
+        System.out.print("Movie ID to remove: ");
         int id = scanner.nextInt();
         scanner.nextLine();
         movieManager.removeMovie(id);
