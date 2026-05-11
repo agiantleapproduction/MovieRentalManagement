@@ -66,8 +66,11 @@ public class RentalManager {
                     updateRental.setInt(1, customerId);
                     updateRental.setInt(2, movieId);
                     int rowsAffected = updateRental.executeUpdate();
+                    
                     if (rowsAffected > 0) {
                         System.out.println("Success: Movie returned.");
+                    } else {
+                        System.out.println("Error: This customer is not actively renting movie ID " + movieId + ".");
                     }
                 }
             }
