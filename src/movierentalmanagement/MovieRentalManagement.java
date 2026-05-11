@@ -205,6 +205,12 @@ public class MovieRentalManagement {
         String email = scanner.nextLine();
         if (isCancel(email)) return;
 
+        // Check if the email already exists before inserting
+        if (customerManager.customerExists(email)) {
+            System.out.println("Error: A customer with that email already exists.");
+            return;
+        }
+
         customerManager.addCustomer(fname, lname, email);
     }
 
@@ -216,9 +222,21 @@ public class MovieRentalManagement {
         String currentEmail = scanner.nextLine();
         if (isCancel(currentEmail)) return;
 
+        // Check if the current email exists before proceeding
+        if (!customerManager.customerExists(currentEmail)) {
+            System.out.println("Error: No customer found with that email.");
+            return;
+        }
+
         System.out.print("Enter new email (or press Enter to cancel): ");
         String newEmail = scanner.nextLine();
         if (isCancel(newEmail)) return;
+
+        // Check if the new email is already taken by someone else
+        if (customerManager.customerExists(newEmail)) {
+            System.out.println("Error: A customer with that email already exists.");
+            return;
+        }
 
         customerManager.updateCustomerEmail(currentEmail, newEmail);
     }
@@ -230,6 +248,12 @@ public class MovieRentalManagement {
         System.out.print("Enter customer email to delete (or press Enter to cancel): ");
         String email = scanner.nextLine();
         if (isCancel(email)) return;
+
+        // Check if the email exists before proceeding
+        if (!customerManager.customerExists(email)) {
+            System.out.println("Error: No customer found with that email.");
+            return;
+        }
 
         customerManager.deleteCustomer(email);
     }
@@ -275,6 +299,13 @@ public class MovieRentalManagement {
         
         try {
             int id = Integer.parseInt(input);
+            
+            // Check if the movie exists before proceeding
+            if (!movieManager.movieExists(id)) {
+                System.out.println("Error: No movie found with ID " + id + ".");
+                return;
+            }
+            
             movieManager.removeMovie(id);
         } catch (NumberFormatException e) {
             System.out.println("Invalid ID format. Action canceled.");
@@ -285,6 +316,7 @@ public class MovieRentalManagement {
     private static void processRental(Scanner scanner, RentalManager rentalManager) {
         EmployeeManager employeeManager = new EmployeeManager();
         MovieManager movieManager = new MovieManager();
+        CustomerManager customerManager = new CustomerManager();
 
         try {
             employeeManager.displayAllEmployees();
@@ -293,16 +325,34 @@ public class MovieRentalManagement {
             if (isCancel(empInput)) return;
             int employeeId = Integer.parseInt(empInput);
 
-            new CustomerManager().displayAllCustomers();
+            // Check if the employee exists before proceeding
+            if (!employeeManager.employeeExists(employeeId)) {
+                System.out.println("Error: No employee found with ID " + employeeId + ".");
+                return;
+            }
+
+            customerManager.displayAllCustomers();
             System.out.print("Customer email (or press Enter to cancel): ");
             String customerEmail = scanner.nextLine();
             if (isCancel(customerEmail)) return;
+
+            // Check if the customer exists before proceeding
+            if (!customerManager.customerExists(customerEmail)) {
+                System.out.println("Error: No customer found with that email.");
+                return;
+            }
 
             movieManager.displayAllMovies();
             System.out.print("Movie ID (or press Enter to cancel): ");
             String movInput = scanner.nextLine();
             if (isCancel(movInput)) return;
             int movieId = Integer.parseInt(movInput);
+
+            // Check if the movie exists before proceeding
+            if (!movieManager.movieExists(movieId)) {
+                System.out.println("Error: No movie found with ID " + movieId + ".");
+                return;
+            }
 
             rentalManager.processRental(customerEmail, movieId, employeeId);
             

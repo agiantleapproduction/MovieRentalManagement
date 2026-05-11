@@ -70,5 +70,20 @@ public class EmployeeManager {
             System.out.println("Error fetching employee stats: " + e.getMessage());
         }
     }
+    
+    // Check if an employee exists by ID
+    public boolean employeeExists(int employeeId) {
+        String sql = "SELECT 1 FROM employee WHERE employee_id = ?";
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, employeeId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checking employee: " + e.getMessage());
+            return false;
+        }
+    }
 
 } 

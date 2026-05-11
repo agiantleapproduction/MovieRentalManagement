@@ -34,8 +34,6 @@ public class MovieManager {
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Success: Movie removed.");
-            } else {
-                System.out.println("Error: No movie found with ID " + movieId);
             }
         } catch (SQLException e) {
             System.out.println("Error removing movie: " + e.getMessage());
@@ -44,7 +42,6 @@ public class MovieManager {
 
     // Display all movies in table format
     public void displayAllMovies() {
-        // Changed ORDER BY title ASC to ORDER BY movie_id ASC
         String sql = "SELECT movie_id, title, release_year, rental_rate FROM movie ORDER BY movie_id ASC";
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -64,5 +61,19 @@ public class MovieManager {
             System.out.println("Error fetching movies: " + e.getMessage());
         }
     }
-
-} 
+    
+    // Check if a movie exists by ID
+    public boolean movieExists(int movieId) {
+        String sql = "SELECT 1 FROM movie WHERE movie_id = ?";
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, movieId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checking movie: " + e.getMessage());
+            return false;
+        }
+    }
+}

@@ -19,24 +19,19 @@ public class RentalManager {
             findCustomer.setString(1, customerEmail);
             ResultSet rs = findCustomer.executeQuery();
             
-            // If no customer found with that email, stop here
-            if (!rs.next()) {
-                System.out.println("Error: No customer found with that email.");
-                return;
-            }
-            
-            // Store the customer_id found by email
-            int customerId = rs.getInt("customer_id");
-            
-            // Now insert into rental table using the three IDs
-            String insertSql = "INSERT INTO rental (customer_id, movie_id, employee_id) VALUES (?, ?, ?)";
-            try (PreparedStatement insertRental = conn.prepareStatement(insertSql)) {
-                insertRental.setInt(1, customerId); // customer_id found from email lookup
-                insertRental.setInt(2, movieId);
-                insertRental.setInt(3, employeeId);
-                int rowsAffected = insertRental.executeUpdate();
-                if (rowsAffected > 0) {
-                    System.out.println("Success: Rental processed.");
+            if (rs.next()) {
+                int customerId = rs.getInt("customer_id");
+                
+                // Now insert into rental table using the three IDs
+                String insertSql = "INSERT INTO rental (customer_id, movie_id, employee_id) VALUES (?, ?, ?)";
+                try (PreparedStatement insertRental = conn.prepareStatement(insertSql)) {
+                    insertRental.setInt(1, customerId);
+                    insertRental.setInt(2, movieId);
+                    insertRental.setInt(3, employeeId);
+                    int rowsAffected = insertRental.executeUpdate();
+                    if (rowsAffected > 0) {
+                        System.out.println("Success: Rental processed.");
+                    }
                 }
             }
 
@@ -57,30 +52,23 @@ public class RentalManager {
             findCustomer.setString(1, customerEmail);
             ResultSet rs = findCustomer.executeQuery();
             
-            // If no customer found with that email, stop here
-            if (!rs.next()) {
-                System.out.println("Error: No customer found with that email.");
-                return;
-            }
-            
-            // Store the customer_id found by email
-            int customerId = rs.getInt("customer_id");
-            
-            // Update the oldest active rental for this customer and movie
-            String updateSql = "UPDATE rental SET return_date = CURRENT_DATE " +
-                               "WHERE rental_id = (" +
-                               "    SELECT rental_id FROM rental " +
-                               "    WHERE customer_id = ? AND movie_id = ? AND return_date IS NULL " +
-                               "    ORDER BY rent_date ASC LIMIT 1" +
-                               ")";
-            try (PreparedStatement updateRental = conn.prepareStatement(updateSql)) {
-                updateRental.setInt(1, customerId);
-                updateRental.setInt(2, movieId);
-                int rowsAffected = updateRental.executeUpdate();
-                if (rowsAffected > 0) {
-                    System.out.println("Success: Movie returned.");
-                } else {
-                    System.out.println("Error: No active rental found for this customer and movie.");
+            if (rs.next()) {
+                int customerId = rs.getInt("customer_id");
+                
+                // Update the oldest active rental for this customer and movie
+                String updateSql = "UPDATE rental SET return_date = CURRENT_DATE " +
+                                   "WHERE rental_id = (" +
+                                   "    SELECT rental_id FROM rental " +
+                                   "    WHERE customer_id = ? AND movie_id = ? AND return_date IS NULL " +
+                                   "    ORDER BY rent_date ASC LIMIT 1" +
+                                   ")";
+                try (PreparedStatement updateRental = conn.prepareStatement(updateSql)) {
+                    updateRental.setInt(1, customerId);
+                    updateRental.setInt(2, movieId);
+                    int rowsAffected = updateRental.executeUpdate();
+                    if (rowsAffected > 0) {
+                        System.out.println("Success: Movie returned.");
+                    }
                 }
             }
 
@@ -91,7 +79,6 @@ public class RentalManager {
 
     // Display all active rentals from view
     public void displayActiveRentals() {
-        // Sorts by rent_date ASC to show oldest rentals first
         String sql = "SELECT * FROM vw_active_rentals ORDER BY rent_date ASC";
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);

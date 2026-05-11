@@ -54,8 +54,6 @@ public class CustomerManager {
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Success: Email updated.");
-            } else {
-                System.out.println("Error: No customer found with that email.");
             }
         } catch (SQLException e) {
             System.out.println("Error updating email: " + e.getMessage());
@@ -71,12 +69,24 @@ public class CustomerManager {
             int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("Success: Customer deleted.");
-            } else {
-                System.out.println("Error: No customer found with that email.");
             }
         } catch (SQLException e) {
             System.out.println("Error deleting customer: " + e.getMessage());
         }
     }
-
-} 
+    
+    // Check if a customer exists by email
+    public boolean customerExists(String email) {
+        String sql = "SELECT 1 FROM customer WHERE email = ?";
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error checking customer: " + e.getMessage());
+            return false;
+        }
+    }
+}
