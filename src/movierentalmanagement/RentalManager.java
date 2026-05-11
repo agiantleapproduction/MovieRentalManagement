@@ -78,22 +78,25 @@ public class RentalManager {
     }
 
     // Display all active rentals from view
+    // Display all active rentals from view
     public void displayActiveRentals() {
+        // Sorts by rent_date ASC to show oldest rentals first
         String sql = "SELECT * FROM vw_active_rentals ORDER BY rent_date ASC";
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             System.out.println("\n--- Currently Active Rentals ---");
-            System.out.printf("%-20s %-25s %-15s %-15s\n", "Customer", "Movie Title", "Rent Date", "Processed By");
-            System.out.println("--------------------------------------------------------------------------------");
+            System.out.printf("%-20s %-25s %-25s %-15s %-15s\n", "Customer", "Email", "Movie Title", "Rent Date", "Processed By");
+            System.out.println("-----------------------------------------------------------------------------------------------------");
             while (rs.next()) {
                 String customerName = rs.getString("customer_name");
+                String customerEmail = rs.getString("customer_email");
                 String movieTitle = rs.getString("movie_title");
                 java.sql.Date rentDate = rs.getDate("rent_date");
                 String processedBy = rs.getString("processed_by");
-                System.out.printf("%-20s %-25s %-15s %-15s\n", customerName, movieTitle, rentDate, processedBy);
+                System.out.printf("%-20s %-25s %-25s %-15s %-15s\n", customerName, customerEmail, movieTitle, rentDate, processedBy);
             }
-            System.out.println("--------------------------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------------------------");
         } catch (SQLException e) {
             System.out.println("Error fetching active rentals: " + e.getMessage());
         }
