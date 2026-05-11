@@ -24,10 +24,11 @@ public class MovieRentalManagement {
 
             System.out.println("\n== Movie Rental System ===");
             System.out.println("1. Customer Management");
-            System.out.println("2. Movie Inventory");
-            System.out.println("3. Rental & Return");
-            System.out.println("4. Reports");
-            System.out.println("5. Exit");
+            System.out.println("2. Employee Management");
+            System.out.println("3. Movie Inventory/Management");
+            System.out.println("4. Rental & Return");
+            System.out.println("5. Reports");
+            System.out.println("6. Exit");
             System.out.print("Enter choice: ");
 
             int choice = 0;
@@ -40,10 +41,11 @@ public class MovieRentalManagement {
 
             switch (choice) {
                 case 1 -> customerMenu(scanner, connection);
-                case 2 -> movieMenu(scanner, connection);
-                case 3 -> rentalMenu(scanner, connection);
-                case 4 -> reportsMenu(scanner, connection);
-                case 5 -> {
+                case 2 -> employeeMenu(scanner, connection);
+                case 3 -> movieMenu(scanner, connection);
+                case 4 -> rentalMenu(scanner, connection);
+                case 5 -> reportsMenu(scanner, connection);
+                case 6 -> {
                     System.out.println("Goodbye!");
                     running = false;
                 }
@@ -88,16 +90,46 @@ public class MovieRentalManagement {
             }
         }
     } 
+    
+    // Employee management sub-menu
+    private static void employeeMenu(Scanner scanner, Connection connection) {
+        boolean running = true;
+        while (running) {
+            System.out.println("\n-- Employee Management --");
+            System.out.println("1. List All Employees");
+            System.out.println("2. Add Employee");
+            System.out.println("3. Back");
+            System.out.print("Enter choice: ");
+
+            int choice = 0;
+            try {
+                choice = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                continue;
+            }
+
+            switch (choice) {
+                case 1 -> new EmployeeManager().displayAllEmployees();
+                case 2 -> addEmployee(scanner, connection);
+                case 3 -> running = false;
+                default -> System.out.println("Invalid choice. Try again.");
+            }
+        }
+    }
 
     // Movie inventory sub-menu
     private static void movieMenu(Scanner scanner, Connection connection) {
         boolean running = true;
         while (running) {
-            System.out.println("\n-- Movie Inventory --");
+            System.out.println("\n-- Movie Inventory/Management --");
             System.out.println("1. List All Movies");
             System.out.println("2. Add Movie");
             System.out.println("3. Remove Movie");
-            System.out.println("4. Back");
+            System.out.println("4. List All Categories");
+            System.out.println("5. Add Category");
+            System.out.println("6. Update Category");
+            System.out.println("7. Back");
             System.out.print("Enter choice: ");
 
             int choice = 0;
@@ -112,11 +144,14 @@ public class MovieRentalManagement {
                 case 1 -> new MovieManager().displayAllMovies();
                 case 2 -> addMovie(scanner, connection);
                 case 3 -> removeMovie(scanner, connection);
-                case 4 -> running = false;
+                case 4 -> new MovieManager().displayAllCategories();
+                case 5 -> addCategory(scanner, connection);
+                case 6 -> updateCategory(scanner, connection);
+                case 7 -> running = false;
                 default -> System.out.println("Invalid choice. Try again.");
             }
         }
-    } 
+    }
 
     // Rental & Return sub-menu
     private static void rentalMenu(Scanner scanner, Connection connection) {
@@ -155,8 +190,7 @@ public class MovieRentalManagement {
         while (running) {
             System.out.println("\n-- Reports --");
             System.out.println("1. Employee Rental Stats");
-            System.out.println("2. Add Employee");
-            System.out.println("3. Back");
+            System.out.println("2. Back");
             System.out.print("Enter choice: ");
 
             int choice = 0;
@@ -169,22 +203,7 @@ public class MovieRentalManagement {
 
             switch (choice) {
                 case 1 -> employeeManager.displayEmployeeRentalStats();
-                case 2 -> {
-                    System.out.print("First name (or press Enter to cancel): ");
-                    String fname = scanner.nextLine();
-                    if (isCancel(fname)) break;
-
-                    System.out.print("Last name (or press Enter to cancel): ");
-                    String lname = scanner.nextLine();
-                    if (isCancel(lname)) break;
-
-                    System.out.print("Role (or press Enter to cancel): ");
-                    String role = scanner.nextLine();
-                    if (isCancel(role)) break;
-
-                    employeeManager.addEmployee(fname, lname, role);
-                }
-                case 3 -> running = false;
+                case 2 -> running = false;
                 default -> System.out.println("Invalid choice. Try again.");
             }
         }
@@ -257,6 +276,24 @@ public class MovieRentalManagement {
 
         customerManager.deleteCustomer(email);
     }
+    
+    // Employee actions
+    private static void addEmployee(Scanner scanner, Connection connection) {
+        EmployeeManager employeeManager = new EmployeeManager();
+        System.out.print("First name (or press Enter to cancel): ");
+        String fname = scanner.nextLine();
+        if (isCancel(fname)) return;
+
+        System.out.print("Last name (or press Enter to cancel): ");
+        String lname = scanner.nextLine();
+        if (isCancel(lname)) return;
+
+        System.out.print("Role (or press Enter to cancel): ");
+        String role = scanner.nextLine();
+        if (isCancel(role)) return;
+
+        employeeManager.addEmployee(fname, lname, role);
+    }
 
     // Movie actions
     private static void addMovie(Scanner scanner, Connection connection) {
@@ -277,10 +314,18 @@ public class MovieRentalManagement {
             if (isCancel(rateInput)) return;
             double rate = Double.parseDouble(rateInput);
 
+            // Display available categories before asking for ID
+            movieManager.displayAllCategories();
             System.out.print("Category ID (or press Enter to cancel): ");
             String catInput = scanner.nextLine();
             if (isCancel(catInput)) return;
             int categoryId = Integer.parseInt(catInput);
+
+            // Check if the category exists before proceeding
+            if (!movieManager.categoryExists(categoryId)) {
+                System.out.println("Error: No category found with ID " + categoryId + ".");
+                return;
+            }
 
             movieManager.addMovie(title, year, rate, categoryId);
             
@@ -307,6 +352,43 @@ public class MovieRentalManagement {
             }
             
             movieManager.removeMovie(id);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid ID format. Action canceled.");
+        }
+    }
+    
+    // Category actions
+    private static void addCategory(Scanner scanner, Connection connection) {
+        MovieManager movieManager = new MovieManager();
+        System.out.print("Category name (or press Enter to cancel): ");
+        String name = scanner.nextLine();
+        if (isCancel(name)) return;
+        
+        movieManager.addCategory(name);
+    }
+    
+    private static void updateCategory(Scanner scanner, Connection connection) {
+        MovieManager movieManager = new MovieManager();
+        movieManager.displayAllCategories();
+        
+        System.out.print("Enter Category ID to update (or press Enter to cancel): ");
+        String idInput = scanner.nextLine();
+        if (isCancel(idInput)) return;
+        
+        try {
+            int id = Integer.parseInt(idInput);
+            
+            if (!movieManager.categoryExists(id)) {
+                System.out.println("Error: No category found with ID " + id + ".");
+                return;
+            }
+            
+            System.out.print("Enter new category name (or press Enter to cancel): ");
+            String newName = scanner.nextLine();
+            if (isCancel(newName)) return;
+            
+            movieManager.updateCategory(id, newName);
+            
         } catch (NumberFormatException e) {
             System.out.println("Invalid ID format. Action canceled.");
         }
